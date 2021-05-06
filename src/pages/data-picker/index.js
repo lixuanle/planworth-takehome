@@ -6,6 +6,7 @@ import ChartForm from "../../components/charts-form";
 const DataPicker = ({ xDataArray, setXDataArray, yDataArray, setYDataArray}) => {
 
   const [numRows, setNumRows] = useState(1);
+  const [sameLength, setSameLength] = useState(true);
   let inputRows = [];
 
   useEffect(() => {
@@ -15,6 +16,20 @@ const DataPicker = ({ xDataArray, setXDataArray, yDataArray, setYDataArray}) => 
       setNumRows(yDataArray.length)
     }
   }, [numRows, xDataArray, yDataArray])
+
+  useEffect(() => {
+    const filteredXDataArray = (xDataArray.filter(item => {
+      if (!isNaN(item) || item !== undefined) {
+        return item
+      }
+    }));
+    const filteredYDataArray = (yDataArray.filter(item => {
+      if (!isNaN(item) || item !== undefined) {
+        return item
+      }
+    }));
+    setSameLength(filteredXDataArray.length === filteredYDataArray.length);
+  }, [xDataArray, yDataArray])
 
   const updateX = ({ target: { value }}, index) => {
     if (!isNaN(parseInt(value))) {
@@ -31,12 +46,20 @@ const DataPicker = ({ xDataArray, setXDataArray, yDataArray, setYDataArray}) => 
       setYDataArray(newArr);
     }
   }
-
+  
   for (let i=0;i<numRows;i++) {
     inputRows.push( 
       <InputContainer key={i}>
-        <ColumnInputBox type="number" onChange={e => updateX(e,i)} placeholder={!isNaN(xDataArray[i]) ? xDataArray[i] : null}/>
-        <ColumnInputBox type="number" onChange={e => updateY(e,i)} placeholder={!isNaN(yDataArray[i]) ? yDataArray[i] : null}/>
+        <ColumnInputBox 
+          type="number" 
+          onChange={e => updateX(e,i)} 
+          placeholder={!isNaN(xDataArray[i]) ? xDataArray[i] : null}
+        />
+        <ColumnInputBox 
+          type="number" 
+          onChange={e => updateY(e,i)} 
+          placeholder={!isNaN(yDataArray[i]) ? yDataArray[i] : null}
+        />
       </InputContainer>
     )
   }
@@ -58,7 +81,7 @@ const DataPicker = ({ xDataArray, setXDataArray, yDataArray, setYDataArray}) => 
         inputRows={inputRows}
         numRows={numRows}
         setNumRows={setNumRows}
-        sameLength={xDataArray.length === yDataArray.length}
+        sameLength={sameLength}
       />
     </FormContainer>
   )
