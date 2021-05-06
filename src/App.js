@@ -1,24 +1,61 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from "react-router-dom";
 
-function App() {
+import DataPicker from "./pages/data-picker";
+import ChartsPage from "./pages/charts";
+
+const App = () => {
+
+  const [xDataArray, setXDataArray] = useState([]);
+  const [yDataArray, setYDataArray] = useState([]);
+
+  useEffect(() => {
+    const sessionXArray = sessionStorage.getItem("xDataArray");
+    const sessionYArray = sessionStorage.getItem("yDataArray");
+    if (sessionXArray?.length > 0) {
+      let storedArray = sessionXArray.split(',');
+      for (let index in storedArray) {
+        storedArray[index] = parseInt(storedArray[index])
+      }
+      setXDataArray(storedArray);
+    }
+    if (sessionYArray?.length > 0) {
+      let storedArray = sessionYArray.split(',');
+      for (let index in storedArray) {
+        storedArray[index] = parseInt(storedArray[index])
+      }
+      setYDataArray(storedArray);
+    }
+  }, [])
+
+  useEffect(() => {
+    sessionStorage.setItem("xDataArray", [...xDataArray])
+    sessionStorage.setItem("yDataArray", [...yDataArray])
+  }, [xDataArray, yDataArray])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        <Route exact path="/">
+          <DataPicker 
+            xDataArray={xDataArray}
+            yDataArray={yDataArray}
+            setXDataArray={setXDataArray}
+            setYDataArray={setYDataArray}
+          />
+        </Route>
+        <Route exact path="/charts">
+          <ChartsPage 
+            xDataArray={xDataArray}
+            yDataArray={yDataArray}
+          />
+        </Route>
+      </Switch>
+    </Router>
   );
 }
 
